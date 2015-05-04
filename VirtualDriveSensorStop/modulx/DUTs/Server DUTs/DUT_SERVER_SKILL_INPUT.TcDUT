@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.25">
+  <DUT Name="DUT_SERVER_SKILL_INPUT" Id="{b3bc7e6b-4af7-49a9-af6b-49f8eea15794}">
+    <Declaration><![CDATA[TYPE DUT_SERVER_SKILL_INPUT :
+STRUCT
+	///Range of parameters
+	ParameterInput: DUT_SERVER_PARAMETERINPUTARRAY;
+	///Start process
+	Execute: BOOL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

@@ -1,0 +1,65 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.25">
+  <POU Name="MNG_SIMULATION" Id="{de4e2635-3bf4-463f-b602-5c364420536b}">
+    <Declaration><![CDATA[FUNCTION_BLOCK MNG_Simulation
+VAR_INPUT
+    bEnable    : BOOL                          := FALSE;
+    outputs    : MNG_APPLICATION_OUTPUTS_32BIT         ;
+END_VAR
+VAR_OUTPUT
+    inputs     : MNG_APPLICATION_INPUTS_32BIT          ;
+END_VAR
+VAR
+    ioUpdater  : MNG_UpdateIOs                 := (sRemoteHost := '192.168.42.31', nRemotePort := 6000);
+    fbCloseAll : FB_SocketCloseAll;
+    bCloseAll  : BOOL := TRUE;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[(* @END_DECLARATION := '0'                                                    *)
+IF bCloseAll THEN (*On PLC reset or program download close all old (opened) connections *)
+    bCloseAll := FALSE;
+    fbCloseAll( bExecute:= TRUE );
+ELSE
+    fbCloseAll( bExecute:= FALSE );
+END_IF
+
+IF NOT fbCloseAll.bBusy THEN
+
+    (* ------------------------------------- trigger data exchange ----------------------------------------------------------------------------*)
+   ioUpdater(Outputs := outputs, Inputs => inputs, bEnable := bEnable);
+
+END_IF
+
+outputs.DosierModul_00_ACT_POS02 := (Simulation.XPosition3 -2000)/1000;
+
+outputs.Keksmodul_00_ACT_POS02 := (Simulation.XPosition0 -2000)/1000;
+
+outputs.Toppingmodul_Beckhoff_00_ACT_POS02 := (Simulation.XPosition1 -2000)/1000;
+
+outputs.Toppingmodul_Bosch_00_ACT_POS02 := (Simulation.XPosition2 -2000)/1000;
+
+GVL.init_sensor_x := inputs.init_sensor_module_x_00_IR;
+
+outputs.MotorX_00_par1 := GVL.lamp1;
+outputs.MotorX_00_par2 := GVL.lamp2;
+
+outputs.status_00_on102 := MI5.Simulation.Cookie.Ready;
+outputs.status_00_on202 := MI5.Simulation.Cookie.Busy;
+outputs.status_00_on302 := MI5.Simulation.Cookie.Error;
+
+outputs.status_00_on103 := MI5.Simulation.Topping_Bosch.Ready;
+outputs.status_00_on203 := MI5.Simulation.Topping_Bosch.Busy;
+outputs.status_00_on303 := MI5.Simulation.Topping_Bosch.Error;
+
+outputs.status_00_on104 := MI5.Simulation.Topping_Beckhoff.Ready;
+outputs.status_00_on204 := MI5.Simulation.Topping_Beckhoff.Busy;
+outputs.status_00_on304 := MI5.Simulation.Topping_Beckhoff.Error;
+
+outputs.status_00_on105 := MI5.Simulation.Cocktail.Ready;
+outputs.status_00_on205 := MI5.Simulation.Cocktail.Busy;
+outputs.status_00_on305 := MI5.Simulation.Cocktail.Error;]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

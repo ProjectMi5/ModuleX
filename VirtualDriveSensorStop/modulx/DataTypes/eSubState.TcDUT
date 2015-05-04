@@ -1,0 +1,25 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.23">
+  <DUT Name="eSubState" Id="{84a9fcb8-644e-43fe-a3e3-ba06a587011e}">
+    <Declaration><![CDATA[TYPE eSubState :
+(
+	step0 := 0,
+	step1 := 1,
+	step2 := 2,
+	step3 := 3,
+	step4 := 4,
+	step5 := 5,
+	step6 := 6,
+	step7 := 7,
+	step8 := 8,
+	step9 := 9,
+	step10 := 10,
+	step11 := 11,
+	step12 := 12,
+	step13 := 13,
+	step14 := 14,
+	step15 := 15
+);
+END_TYPE]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

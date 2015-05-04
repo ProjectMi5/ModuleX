@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.25">
+  <DUT Name="MNG_TRAFO" Id="{b9af7cfa-7f1a-4149-ba97-3812046cdda5}">
+    <Declaration><![CDATA[TYPE MNG_TRAFO :(* position and orientation as a 4x4 matrix *)
+STRUCT
+	baseX : VEC3; 
+	fill0 : REAL;
+	baseY : VEC3; 
+	fill1 : REAL;
+	baseZ : VEC3; 
+	fill2 : REAL;
+	origin : VEC3;
+	fill3 : REAL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

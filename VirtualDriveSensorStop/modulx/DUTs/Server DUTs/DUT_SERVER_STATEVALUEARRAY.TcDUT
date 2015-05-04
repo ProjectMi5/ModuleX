@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.25">
+  <DUT Name="DUT_SERVER_STATEVALUEARRAY" Id="{1a623e30-77ad-4b2d-9b09-83e6a43ee7a7}">
+    <Declaration><![CDATA[TYPE DUT_SERVER_STATEVALUEARRAY :
+STRUCT
+	StateValue0: DUT_STATEVALUES;
+	StateValue1: DUT_STATEVALUES;
+	StateValue2: DUT_STATEVALUES;
+	StateValue3: DUT_STATEVALUES;
+	StateValue4: DUT_STATEVALUES;
+	StateValue5: DUT_STATEVALUES;
+	StateValue6: DUT_STATEVALUES;
+	StateValue7: DUT_STATEVALUES;
+	StateValue8: DUT_STATEVALUES;
+	StateValue9: DUT_STATEVALUES;
+	StateValue10: DUT_STATEVALUES;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

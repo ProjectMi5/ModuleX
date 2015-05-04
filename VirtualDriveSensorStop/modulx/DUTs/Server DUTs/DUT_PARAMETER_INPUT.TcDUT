@@ -1,0 +1,15 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.25">
+  <DUT Name="DUT_PARAMETER_INPUT" Id="{00945634-5f21-4922-9d4c-9ebccaa8d176}">
+    <Declaration><![CDATA[TYPE DUT_PARAMETER_INPUT :
+STRUCT
+	///Value of the parameter 
+	Value: LREAL;
+	///Possibility to a string value depending on the parameter
+	StringValue: STRING(80);
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

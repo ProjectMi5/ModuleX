@@ -1,0 +1,12 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.25">
+  <DUT Name="MNG_POSE6" Id="{7638a74e-56e4-46b3-8b1d-afc11af3da70}">
+    <Declaration><![CDATA[TYPE MNG_POSE6 :(* position and orientation as an euler based pose *)
+STRUCT
+	x, y, z, a, b, c : REAL;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

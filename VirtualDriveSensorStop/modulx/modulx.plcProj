@@ -1,0 +1,203 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <FileVersion>1.0.0.0</FileVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{2c16a0da-f0b7-4e47-8a61-255ab7c6c44e}</ProjectGuid>
+    <Name>modulx</Name>
+    <ProgramVersion>3.1.0.8</ProgramVersion>
+    <Application>{2506d2eb-c4a9-4024-af2a-d0c280b6e644}</Application>
+    <TypeSystem>{3cfb462c-ff33-4ae0-9114-2f0a4edf7e34}</TypeSystem>
+    <Implicit_Task_Info>{4c077a7d-2e52-4373-991b-ac8e2611d857}</Implicit_Task_Info>
+    <Implicit_KindOfTask>{88289cd2-8f38-47f0-a758-0996574d6802}</Implicit_KindOfTask>
+    <Implicit_Jitter_Distribution>{e750944b-2145-4fb2-865a-0e477e109ffc}</Implicit_Jitter_Distribution>
+    <LibraryReferences>{0f5467a9-8867-472d-98ec-f900a5bd6533}</LibraryReferences>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="DataTypes\eMainState.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DataTypes\eSubState.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\ArrayInterFaceDUT\DUTs\Module Interface\DUT_MODULE_INTERFACE.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\ArrayInterFaceDUT\DUTs\Module Interface\Input\DUT_MODULE_INTERFACE_INPUT.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\ArrayInterFaceDUT\DUTs\Module Interface\Input\DUT_SKILL_INPUT.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\ArrayInterFaceDUT\DUTs\Module Interface\Output\DUT_MODULE_INTERFACE_OUTPUT.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\ArrayInterFaceDUT\DUTs\Module Interface\Output\DUT_SKILL_OUTPUT.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\DUT_SIMULATION.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\industrialPhysics\MNG_APPLICATION_INPUTS_32BIT.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\industrialPhysics\MNG_APPLICATION_OUTPUTS_32BIT.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\industrialPhysics\MNG_DataArray.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\industrialPhysics\MNG_DatagramHeader.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\industrialPhysics\MNG_DatagramType.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\industrialPhysics\MNG_POSE6.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\industrialPhysics\MNG_RawDatagram.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\industrialPhysics\MNG_TRAFO.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\industrialPhysics\VEC3.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Server DUTs\DUT_MODE.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Server DUTs\DUT_PARAMETER_INPUT.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Server DUTs\DUT_PARAMETER_OUTPUT.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Server DUTs\DUT_SERVER_MODULE_INTERFACE.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Server DUTs\DUT_SERVER_MODULE_INTERFACE_INPUT.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Server DUTs\DUT_SERVER_MODULE_INTERFACE_OUTPUT.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Server DUTs\DUT_SERVER_PARAMETERINPUTARRAY.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Server DUTs\DUT_SERVER_PARAMETEROUTPUTARRAY.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Server DUTs\DUT_SERVER_SKILLINPUTARRAY.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Server DUTs\DUT_SERVER_SKILLOUTPUTARRAY.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Server DUTs\DUT_SERVER_SKILL_INPUT.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Server DUTs\DUT_SERVER_SKILL_OUTPUT.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Server DUTs\DUT_SERVER_STATEVALUEARRAY.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Server DUTs\DUT_SIMU_SKILLSTATE.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="DUTs\Server DUTs\DUT_STATEVALUES.TcDUT">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GVLs\GVL.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GVLs\MI5.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GVLs\MNG_GLOBALS.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="GVLs\OPCConstants.TcGVL">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="PlcTask.TcTTO">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\FB_FAKE_MODULE.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\FB_Translate.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\industrialPhysics\FB_LogFifo.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\industrialPhysics\MAIN_simu.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\industrialPhysics\MNG_SIMULATION.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\industrialPhysics\MNG_UPDATEIOS.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="POUs\MAIN.TcPOU">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="SimuTask.TcTTO">
+      <SubType>Code</SubType>
+    </Compile>
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="DUTs" />
+    <Folder Include="DUTs\ArrayInterFaceDUT\DUTs\" />
+    <Folder Include="DUTs\ArrayInterFaceDUT\DUTs\Module Interface\" />
+    <Folder Include="DUTs\ArrayInterFaceDUT\DUTs\Module Interface\Input\" />
+    <Folder Include="DUTs\ArrayInterFaceDUT\DUTs\Module Interface\Output\" />
+    <Folder Include="DUTs\industrialPhysics" />
+    <Folder Include="DUTs\ArrayInterFaceDUT" />
+    <Folder Include="DUTs\Server DUTs\" />
+    <Folder Include="GVLs" />
+    <Folder Include="DataTypes" />
+    <Folder Include="POUs\industrialPhysics" />
+    <Folder Include="VISUs" />
+    <Folder Include="POUs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PlaceholderReference Include="Tc2_Standard">
+      <DefaultResolution>Tc2_Standard, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_Standard</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc2_System">
+      <DefaultResolution>Tc2_System, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc2_System</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc3_Interfaces">
+      <DefaultResolution>Tc3_Interfaces, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc3_Interfaces</Namespace>
+    </PlaceholderReference>
+    <PlaceholderReference Include="Tc3_Module">
+      <DefaultResolution>Tc3_Module, * (Beckhoff Automation GmbH)</DefaultResolution>
+      <Namespace>Tc3_Module</Namespace>
+    </PlaceholderReference>
+  </ItemGroup>
+  <ItemGroup>
+    <LibraryReference Include="Tc2_MC2,3.3.5.0,Beckhoff Automation GmbH">
+      <Namespace>Tc2_MC2</Namespace>
+    </LibraryReference>
+    <LibraryReference Include="Tc2_TcpIp,3.3.2.0,Beckhoff Automation GmbH">
+      <Namespace>Tc2_TcpIp</Namespace>
+    </LibraryReference>
+    <LibraryReference Include="Tc2_Utilities,3.3.7.0,Beckhoff Automation GmbH">
+      <Namespace>Tc2_Utilities</Namespace>
+    </LibraryReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="modulx.tmc">
+      <SubType>Content</SubType>
+    </Content>
+  </ItemGroup>
+  <ProjectExtensions />
+</Project>

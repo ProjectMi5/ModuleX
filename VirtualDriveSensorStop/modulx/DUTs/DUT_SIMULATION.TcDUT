@@ -1,0 +1,28 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.25">
+  <DUT Name="DUT_SIMULATION" Id="{4c50ade2-26f4-4662-b1fd-9ae8096ff500}">
+    <Declaration><![CDATA[TYPE DUT_SIMULATION :
+STRUCT
+XPosition0 : LREAL;
+XPosition1 : lreal;
+XPosition2 : lreal;
+XPosition3 : lreal;
+XPosition4 : lreal;
+XPosition5 : lreal;
+XPosition6 : lreal;
+XPosition7 : lreal;
+XPosition8 : lreal;
+XPosition9 : lreal;
+XPosition10 :LREAL;
+
+Cocktail			: DUT_SIMU_SKILLSTATE;
+Cookie				: DUT_SIMU_SKILLSTATE;
+Topping_Beckhoff	: DUT_SIMU_SKILLSTATE;
+Topping_Bosch		: DUT_SIMU_SKILLSTATE;
+
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

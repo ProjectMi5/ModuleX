@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.25">
+  <GVL Name="MI5" Id="{010b7040-a387-4597-94ac-867dbd568a07}">
+    <Declaration><![CDATA[VAR_GLOBAL
+	//<<OPC-UA Module Interface>>//
+	{attribute 'OPC.UA.DA' := '1'}
+	Module1202 : DUT_SERVER_MODULE_INTERFACE;
+	{attribute 'OPC.UA.DA' := '1'}
+	Module2501 : DUT_SERVER_MODULE_INTERFACE;
+	{attribute 'OPC.UA.DA' := '1'}
+	Module2601 : DUT_SERVER_MODULE_INTERFACE;
+	{attribute 'OPC.UA.DA' := '1'}
+	Simulation: DUT_SIMULATION;
+	{attribute 'OPC.UA.DA' := '1'}	
+	ResetProcessTool 	: BOOL;
+	
+	// INTERN MODULE INTERFACE
+	InternalModule	: DUT_MODULE_INTERFACE;
+END_VAR]]></Declaration>
+    <ObjectProperties />
+  </GVL>
+</TcPlcObject>

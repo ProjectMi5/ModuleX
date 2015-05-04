@@ -1,0 +1,20 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.25">
+  <POU Name="MAIN_simu" Id="{c5c15e1d-44a8-4c3e-a819-f418c54a29eb}">
+    <Declaration><![CDATA[
+PROGRAM MAIN_simu
+VAR
+    simIO : MNG_Simulation;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[// Update IOs with simulation
+simIO(bEnable := TRUE);
+
+// Application code follows here:
+
+
+]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

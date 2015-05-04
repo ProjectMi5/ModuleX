@@ -1,0 +1,38 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.25">
+  <POU Name="MAIN" Id="{9ff952db-2989-4584-8223-db66e71283a0}">
+    <Declaration><![CDATA[PROGRAM MAIN
+VAR
+
+
+	
+	fbTranslate		: FB_TRANSLATE;
+	fbFakeModule	: FB_FAKE_MODULE;
+	fbi_Timer: TOF;
+END_VAR]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+//für dieses modul muss Module1102 (ausgang von fbTranslate) noch auf den richtigen modulausgang geändert werden und in den GVLs eine Variable vom Typ DUT_Module_Interface (mit arrays) und dem namen InternalModule hinzugefügt werden
+// FAKE MODUL:	
+fbFakeModule.SKILLID[0] := 1337;
+
+fbFakeModule(INPUT:=InternalModule.Input, OUTPUT => InternalModule.Output,  Execute := TRUE );
+fbTranslate(ArrayModule := InternalModule, ServerModule := Module1202);
+fbi_Timer();
+
+// sensorhigh delay erzeugen/verlängern
+IF GVL.init_sensor_x THEN
+	Module1202.Output.PositionSensor := TRUE;
+	
+	fbi_Timer(IN := TRUE,PT := T#400MS);
+	fbi_Timer(IN := FALSE,PT := T#400MS);	
+ELSE
+	Module1202.Output.PositionSensor := fbi_Timer.Q;
+END_IF
+
+Module2501.Output.PositionOutput := 1345.0;
+Module2601.Output.PositionOutput := 165.0;]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

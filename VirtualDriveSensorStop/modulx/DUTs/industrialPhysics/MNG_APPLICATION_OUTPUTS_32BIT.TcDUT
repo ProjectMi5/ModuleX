@@ -1,0 +1,33 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.25">
+  <DUT Name="MNG_APPLICATION_OUTPUTS_32BIT" Id="{ed4934d4-1b71-4365-9b3d-47dd9b36feb0}">
+    <Declaration><![CDATA[
+TYPE MNG_APPLICATION_OUTPUTS_32BIT :
+STRUCT
+    NumSignals                     : INT     := 18        ;
+    MotorX_00_par1 : BOOL    := 0; (* Physics://physics/Modulel_X/MotorX?par1 *)
+    MotorX_00_par2 : BOOL    := 0; (* Physics://physics/Modulel_X/MotorX?par2 *)
+    Keksmodul_00_ACT_POS02 : REAL    := 0.0; (* Physics://physics/Keksmodul?KinActual *)
+    Toppingmodul_Bosch_00_ACT_POS02 : REAL    := 0.0; (* Physics://physics/Toppingmodul_Bosch?KinActual *)
+    Toppingmodul_Beckhoff_00_ACT_POS02 : REAL    := 0.0; (* Physics://physics/Toppingmodul_Beckhoff?KinActual *)
+    DosierModul_00_ACT_POS02 : REAL    := 0.0; (* Physics://physics/DosierModul?KinActual *)
+    status_00_on102 : BOOL    := 0; (* Physics://physics/Keksmodul/status_plate/status?on1 *)
+    status_00_on202 : BOOL    := 0; (* Physics://physics/Keksmodul/status_plate/status?on2 *)
+    status_00_on302 : BOOL    := 0; (* Physics://physics/Keksmodul/status_plate/status?on3 *)
+    status_00_on103 : BOOL    := 0; (* /physics/Toppingmodul_Bosch/status_plate/status?on1 *)
+    status_00_on203 : BOOL    := 0; (* /physics/Toppingmodul_Bosch/status_plate/status?on2 *)
+    status_00_on303 : BOOL    := 0; (* /physics/Toppingmodul_Bosch/status_plate/status?on3 *)
+    status_00_on104 : BOOL    := 0; (* ysics/Toppingmodul_Beckhoff/status_plate/status?on1 *)
+    status_00_on204 : BOOL    := 0; (* ysics/Toppingmodul_Beckhoff/status_plate/status?on2 *)
+    status_00_on304 : BOOL    := 0; (* ysics/Toppingmodul_Beckhoff/status_plate/status?on3 *)
+    status_00_on105 : BOOL    := 0; (* ysics://physics/DosierModul/status_plate/status?on1 *)
+    status_00_on205 : BOOL    := 0; (* ysics://physics/DosierModul/status_plate/status?on2 *)
+    status_00_on305 : BOOL    := 0; (* ysics://physics/DosierModul/status_plate/status?on3 *)
+END_STRUCT
+END_TYPE
+
+
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

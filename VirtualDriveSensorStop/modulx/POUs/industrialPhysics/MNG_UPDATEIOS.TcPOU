@@ -1,0 +1,357 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.25">
+  <POU Name="MNG_UPDATEIOS" Id="{62a77d82-2bb6-49ca-8469-8f209da5d1b6}">
+    <Declaration><![CDATA[FUNCTION_BLOCK MNG_UpdateIOs
+(* This function block implements simple TCP/IP client protocol.              *)
+(* The max. size of binary tx/rx data has to be <= PLCPRJ_BUFFER_SIZE         *)
+VAR_IN_OUT
+    Outputs : MNG_APPLICATION_OUTPUTS_32BIT;    (* Tx user data *)
+
+END_VAR
+
+VAR_INPUT
+    bDbg        : BOOL                         := FALSE               ; (* TRUE => Enable debug output, FALSE => Disable debug output *)
+    sRemoteHost : STRING(15)                   := '127.0.0.1'         ; (* IP address of remote server *)	
+    nRemotePort : UDINT                        := 5000                ; (* Remote server port *)
+    bEnable     : BOOL                         := FALSE               ; (* TRUE => Enable/connect, FALSE => Disable/disconnect *)
+    tReconnect  : TIME                         := T#5s                ;
+END_VAR
+
+VAR_OUTPUT
+    errors      : FB_LogFifo                                          ; (* Error message fifo *)
+    eState      : E_SocketConnectionState      := eSOCKET_DISCONNECTED; (* TCP/IP connection state *)
+    Inputs      : MNG_APPLICATION_INPUTS_32BIT                        ; (* Rx user data *)
+END_VAR
+
+VAR
+    counter          : DWORD                        := 0                   ;
+    fbConnect        : FB_ClientServerConnection    := (tReconnect := T#5s); (* Create/release TCP/IP connection *)
+    fbSend           : FB_SocketSend                                       ; (* Send TCP/IP data *)
+    fbReceive        : FB_SocketReceive                                    ; (* Receive TCP/IP data *)
+    state            : BYTE                                                ; (* Global state *)
+    tx_state         : BYTE                                                ; (* Tx state *)
+    rx_state         : BYTE                                                ; (* Rx state *)
+
+    toServer         : MNG_RawDatagram                                     ;
+    fromServer       : MNG_RawDatagram                                     ;
+    cbReceived       : UDINT                                               ; (* Count of received data bytes *)
+    cbRx             : UDINT                                               ; (* Rx frame byte size *)
+
+    bDisconnect      : BOOL                                                ; (* Disconnect flag, if set the socket will be closed *)
+    pollTimer        : TON                                                 ; (* Rx data poll timer *)
+    bAbort           : BOOL                                                ; (* Flag to abort frame parsing loop *)
+    sID              : STRING(20)                   := ''                  ;
+    clock            : FB_LocalSystemTime           := ( bEnable := TRUE ) ; (* OS clock *)
+    _byteCount       : DWORD                                               ;
+    _i               : DWORD                                               ;
+    _ptr             : POINTER TO BYTE                                     ;
+    _internalInputs  : MNG_APPLICATION_INPUTS_32BIT                       ;
+    DWordBuffer      : DWORD                                               ; (* convert DWORD data *)
+    DIntBuffer       : DINT                                                ; (* convert DINT data *)
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[
+(* refresh clock time                                                         *)
+clock();
+
+(* state chart                                                                *)
+CASE state OF
+    0:(* Init state *)
+        (*rx.A_Reset(bDbg := bDbg)  ; (* Reset RX fifo (optional) *)
+        tx.A_Reset    (bDbg := bDbg); (* Reset TX fifo (optional) *)*)
+        errors.Clear(); (* Reset error fifo (optional) *)
+
+        pollTimer( IN := FALSE, PT := PLCPRJ_RECEIVER_POLLING_CYCLE_TIME );
+        bDisconnect := FALSE;(* Reset disconnect flag *)
+        cbReceived  := 0;(* Reset number of received data bytes *)
+        tx_state    := 0;(* Reset tx state machine *)
+        rx_state    := 0;(* Reset rx state machine *)
+        state       := 1;(* Go to the next step *)
+
+    1:(* Create TCP/IP connection *)
+        fbConnect(sSrvNetID := '',
+                  nMode := CONNECT_MODE_ENABLEDBG,(* Enable debug output *)
+                  sRemoteHost := sRemoteHost,
+                  nRemotePort := nRemotePort,
+                  tReconnect  := tReconnect,
+                  bEnable     := bEnable,
+                  eState      => eState);
+        IF NOT fbConnect.bBusy THEN
+
+            (* Create identification string used by debug messages *)
+            sID          := CONCAT(CONCAT('[', DWORD_TO_HEXSTR(fbConnect.hSocket.handle, 4, FALSE) ), ']');
+            errors.sMessage := CONCAT('CLI.Err', sID);
+
+            IF NOT fbConnect.bError THEN
+                IF eState = eSOCKET_CONNECTED THEN(* we are connected *)
+                    state := 2;
+                END_IF
+            ELSE(* connect error: log error *)
+                errors.Error(nErrId := fbConnect.nErrId);
+            END_IF
+        END_IF
+
+    2:(* Data exchange state *)
+        bDisconnect := NOT bEnable OR bDisconnect; (* user/internal disconnect requested? *)
+        IF bDisconnect AND (tx_state = 0) AND (rx_state = 0) THEN
+            state := 3;(* disconnect *)
+        ELSE
+            (*--------------------------- Send tx data -------------------------------------------*)
+            CASE tx_state OF
+                0:
+                    IF NOT bDisconnect THEN
+
+                        (* forcefully send data each cycle *)
+
+                        (* create the raw datagram *)
+                        _byteCount                   := 76;
+                        toServer.Header.ByteCount    := HOST_TO_BE32(in := _byteCount);
+                        toServer.Header.DatagramType := HOST_TO_BE32(in := MNG_Raw32BitImage);
+                        toServer.Header.Counter      := Counter;
+
+                        toServer.Payload[1] := HOST_TO_BE32(18); (* number of signals *)
+
+                        (* BOOL MotorX_00_par1 *)
+                        IF Outputs.MotorX_00_par1 THEN
+                            toServer.Payload[2] := 16#FFFFFFFF;   (*BOOL *)
+                        ELSE
+                            toServer.Payload[2] := 0;
+                        END_IF;
+
+                        (* BOOL MotorX_00_par2 *)
+                        IF Outputs.MotorX_00_par2 THEN
+                            toServer.Payload[3] := 16#FFFFFFFF;   (*BOOL *)
+                        ELSE
+                            toServer.Payload[3] := 0;
+                        END_IF;
+
+                        (* FLOAT32 Keksmodul_00_ACT_POS02 *)
+                        MEMCPY(destAddr := ADR(DWordBuffer), srcAddr := ADR(Outputs.Keksmodul_00_ACT_POS02), n := 4);
+                        toServer.Payload[4] := HOST_TO_BE32(DWordBuffer);
+
+                        (* FLOAT32 Toppingmodul_Bosch_00_ACT_POS02 *)
+                        MEMCPY(destAddr := ADR(DWordBuffer), srcAddr := ADR(Outputs.Toppingmodul_Bosch_00_ACT_POS02), n := 4);
+                        toServer.Payload[5] := HOST_TO_BE32(DWordBuffer);
+
+                        (* FLOAT32 Toppingmodul_Beckhoff_00_ACT_POS02 *)
+                        MEMCPY(destAddr := ADR(DWordBuffer), srcAddr := ADR(Outputs.Toppingmodul_Beckhoff_00_ACT_POS02), n := 4);
+                        toServer.Payload[6] := HOST_TO_BE32(DWordBuffer);
+
+                        (* FLOAT32 DosierModul_00_ACT_POS02 *)
+                        MEMCPY(destAddr := ADR(DWordBuffer), srcAddr := ADR(Outputs.DosierModul_00_ACT_POS02), n := 4);
+                        toServer.Payload[7] := HOST_TO_BE32(DWordBuffer);
+
+                        (* BOOL status_00_on102 *)
+                        IF Outputs.status_00_on102 THEN
+                            toServer.Payload[8] := 16#FFFFFFFF;   (*BOOL *)
+                        ELSE
+                            toServer.Payload[8] := 0;
+                        END_IF;
+
+                        (* BOOL status_00_on202 *)
+                        IF Outputs.status_00_on202 THEN
+                            toServer.Payload[9] := 16#FFFFFFFF;   (*BOOL *)
+                        ELSE
+                            toServer.Payload[9] := 0;
+                        END_IF;
+
+                        (* BOOL status_00_on302 *)
+                        IF Outputs.status_00_on302 THEN
+                            toServer.Payload[10] := 16#FFFFFFFF;   (*BOOL *)
+                        ELSE
+                            toServer.Payload[10] := 0;
+                        END_IF;
+
+                        (* BOOL status_00_on103 *)
+                        IF Outputs.status_00_on103 THEN
+                            toServer.Payload[11] := 16#FFFFFFFF;   (*BOOL *)
+                        ELSE
+                            toServer.Payload[11] := 0;
+                        END_IF;
+
+                        (* BOOL status_00_on203 *)
+                        IF Outputs.status_00_on203 THEN
+                            toServer.Payload[12] := 16#FFFFFFFF;   (*BOOL *)
+                        ELSE
+                            toServer.Payload[12] := 0;
+                        END_IF;
+
+                        (* BOOL status_00_on303 *)
+                        IF Outputs.status_00_on303 THEN
+                            toServer.Payload[13] := 16#FFFFFFFF;   (*BOOL *)
+                        ELSE
+                            toServer.Payload[13] := 0;
+                        END_IF;
+
+                        (* BOOL status_00_on104 *)
+                        IF Outputs.status_00_on104 THEN
+                            toServer.Payload[14] := 16#FFFFFFFF;   (*BOOL *)
+                        ELSE
+                            toServer.Payload[14] := 0;
+                        END_IF;
+
+                        (* BOOL status_00_on204 *)
+                        IF Outputs.status_00_on204 THEN
+                            toServer.Payload[15] := 16#FFFFFFFF;   (*BOOL *)
+                        ELSE
+                            toServer.Payload[15] := 0;
+                        END_IF;
+
+                        (* BOOL status_00_on304 *)
+                        IF Outputs.status_00_on304 THEN
+                            toServer.Payload[16] := 16#FFFFFFFF;   (*BOOL *)
+                        ELSE
+                            toServer.Payload[16] := 0;
+                        END_IF;
+
+                        (* BOOL status_00_on105 *)
+                        IF Outputs.status_00_on105 THEN
+                            toServer.Payload[17] := 16#FFFFFFFF;   (*BOOL *)
+                        ELSE
+                            toServer.Payload[17] := 0;
+                        END_IF;
+
+                        (* BOOL status_00_on205 *)
+                        IF Outputs.status_00_on205 THEN
+                            toServer.Payload[18] := 16#FFFFFFFF;   (*BOOL *)
+                        ELSE
+                            toServer.Payload[18] := 0;
+                        END_IF;
+
+                        (* BOOL status_00_on305 *)
+                        IF Outputs.status_00_on305 THEN
+                            toServer.Payload[19] := 16#FFFFFFFF;   (*BOOL *)
+                        ELSE
+                            toServer.Payload[19] := 0;
+                        END_IF;
+
+                        toServer.Header.SentTime := HOST_TO_BE32(in := clock.systemTime.wMilliseconds + clock.systemTime.wMinute * 60000);
+
+                        (* send frame *)
+                        fbSend(bExecute  := FALSE);
+                        fbSend(sSrvNetID := '',
+                               hSocket   := fbConnect.hSocket,
+                               cbLen     := SIZEOF(toServer.Header) + _byteCount,(* size of header + size of user data *)
+                               pSrc      := ADR(toServer),(* pointer to the frame data *)
+                               bExecute  := TRUE,
+                               tTimeout  := T#5s);
+
+                        tx_state := 1;
+                    END_IF
+                1:(* wait until send not busy *)
+                    fbSend( bExecute := FALSE );
+                    IF NOT fbSend.bBusy THEN
+                        tx_state := 0;
+                        IF NOT fbSend.bError THEN(* no error *)
+                            ;
+                        ELSE(* send error => log error and disconnect *)
+                            errors.Error(nErrId := fbSend.nErrId );
+                            bDisconnect := TRUE;(* set flag *)
+                        END_IF
+                    END_IF
+            END_CASE
+
+            (* ------------------------------------------- Get/fetch rx data ----------------------------------------------------------------- *)
+            CASE rx_state OF
+                0:
+                    IF NOT bDisconnect THEN
+                        pollTimer( IN := TRUE );
+                        IF pollTimer.Q THEN
+                            pollTimer( IN := FALSE );
+
+                            fbReceive( bExecute := FALSE );
+                            fbReceive( 	sSrvNetId	:= '',
+                            hSocket		:= fbConnect.hSocket,
+                            cbLen		:= SIZEOF(fromServer) - cbReceived,
+                            pDest		:= ADR(fromServer) + cbReceived,
+                            bExecute	:= TRUE,
+                            tTimeout	:= T#5s );
+                            rx_state := 1;
+                        END_IF
+                    END_IF
+                1:(* wait until receive not busy *)
+                    fbReceive( bExecute := FALSE );
+                    IF NOT fbReceive.bBusy THEN
+                        rx_state := 0;
+                        IF NOT fbReceive.bError THEN
+                            IF fbReceive.nRecBytes > 0 THEN (* some bytes received *)
+
+                                pollTimer( PT := T#0s );(* increase polling speed *)
+                                cbReceived := cbReceived + fbReceive.nRecBytes;
+
+                                (* parse received bytes *)
+                                REPEAT
+                                    bAbort := TRUE;(* set flag *)
+                                    IF cbReceived >= SIZEOF(fromServer.Header) THEN (* all header bytes received => check header data *)
+
+                                        (* correct header data *)
+                                        fromServer.Header.ByteCount    := BE32_TO_HOST(fromServer.Header.ByteCount);
+                                        Counter                        := fromServer.Header.Counter;
+                                        fromServer.Header.SentTime     := BE32_TO_HOST(fromServer.Header.SentTime);
+                                        fromServer.Header.DatagramType := BE32_TO_HOST(fromServer.Header.DatagramType);
+
+                                        IF (fromServer.Header.ByteCount <= SIZEOF( fromServer.Payload))(* check frame (user data) length *)
+                                        THEN
+
+                                            cbRx := SIZEOF(fromServer.Header) + fromServer.Header.ByteCount;(* calculate the (expected) length of the rx frame *)
+                                            IF cbReceived >= cbRx  THEN (* all frame bytes received? *)
+
+                                               (* currently only use the data on a 32 Bit raw image *)
+                                                IF fromServer.Header.DatagramType = MNG_Raw32BitImage THEN
+
+                                                    IF 4 = (fromServer.Header.ByteCount - 4) THEN
+
+                                                        (* BOOL init_sensor_module_x_00_IR *)
+                                                        Inputs.init_sensor_module_x_00_IR := fromServer.Payload[2]<>0;
+
+                                                    ELSE(* receive error: invalid frame format/data *)
+                                                        errors.Error(nErrId := PLCPRJ_ERROR_INVALID_IO_FORMAT_RECEIVED );
+                                                    END_IF
+
+                                                END_IF
+
+                                                MEMMOVE( ADR( fromServer ), ADR( fromServer ) + cbRx,  cbReceived - cbRx );(* shift the remaining rx bytes *)
+                                                cbReceived := cbReceived - cbRx;(* recalculate the size of the remaining rx bytes *)
+
+                                                bAbort := FALSE;(* reset flag, try to parse next frame *)
+
+                                                (* ELSE repeat reading *)
+                                            END_IF
+
+                                        ELSE(* receive error: invalid frame format/data *)
+                                            errors.Error(nErrId := PLCPRJ_ERROR_INVALID_FRAME_FORMAT );
+                                            bDisconnect := TRUE;(* set flag *)
+                                        END_IF
+                                        (* ELSE repeat reading *)
+                                    END_IF (* IF cbReceived >= SIZEOF(rxFrame.head) THEN *)
+
+                                UNTIL bAbort
+                                END_REPEAT
+
+                            ELSE(* fbReceive.nRecBytes = 0, repeat reading *)
+                                pollTimer( PT := PLCPRJ_RECEIVER_POLLING_CYCLE_TIME );(* slow down the polling cycle *)
+                            END_IF(* IF fbReceive.nRecBytes > 0 THEN *)
+                        ELSE(* receive error => log error and disconnect *)
+                            errors.Error(nErrId := fbReceive.nErrId );
+                            bDisconnect := TRUE;(* set flag *)
+                        END_IF
+
+                    END_IF(*IF NOT fbReceive.bBusy THEN*)
+
+            END_CASE
+
+        END_IF
+
+    3:(* disconnect *)
+        fbConnect( bEnable:= FALSE, eState=>eState );
+        IF eState = eSOCKET_DISCONNECTED THEN
+            state := 0;
+        END_IF
+
+END_CASE
+]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>

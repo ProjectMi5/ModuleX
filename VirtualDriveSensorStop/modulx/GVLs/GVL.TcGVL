@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.25">
+  <GVL Name="GVL" Id="{7c45efa3-e1c2-4cfe-a920-126b52956dd3}">
+    <Declaration><![CDATA[VAR_GLOBAL
+	pi : REAL := 3.14159;
+																
+	//<<Input Variables>>//
+	iOrder 			AT%I*	: BOOL; 				// is there a order to separate cookies? --> from database
+	iDiskAtStorage 	AT%I*	: BOOL; 				// is the gap of the disk at the storage? --> from hall sensor
+	iDiskAtRamp 	AT%I*	: BOOL;					// is the gap of the disk at the ramp? --> from hall sensor
+	iCookieInOutput	AT%I*	: BOOL;					// is the cookie in the ouput (on the clamp)? --> from light barrier sensor
+	iStorageLevel 	AT%I*	: INT;					// number of remaining cookies in the storage --> from distance sensor
+	iClearence		AT%I*	: BOOL;					// did the user clear the refilling/maintenance process --> from HMI
+	
+	//<<Output Variables>>//
+	oTurnDiskLeft	AT%Q*	: BOOL := FALSE;		// turn disk anti-clockwise/left 
+										 			//@TODO: later as a function with choosable fastVel/acceleration/...
+	oTurnDiskRight	AT%Q*	: BOOL := FALSE;		// turn disk anti-clockwise/left 
+										 			//@TODO: later as a function with choosable fastVel/acceleration/...							
+	//oStorageEmpty	AT%Q*	: BOOL := FALSE;		// ???? message to HMI about cookie storage
+	oHMIMessage		AT%Q*	: STRING :='';			//message to HMI depending on current state
+	
+	//<<Internal Variables>>//
+	mainState 				: eMainState		:= eMainState.init;
+	subState				: eSubState 		:= eSubState.step0;	
+	
+	axis	 				: AXIS_REF;
+	fastVel					: INT	:= 40;
+	slowVel					: INT	:= 20;
+	
+	
+	
+	
+	//<<For Visualization>>//
+	init_					: BOOL := FALSE;
+	ready_					: BOOL := FALSE;
+	output_					: BOOL := FALSE;
+	separation_				: BOOL := FALSE;
+	refill_					: BOOL := FALSE;
+	
+	offset					: LREAL;
+	infinitsimu				: BOOL;
+	infinitsimu2			: BOOL;	
+	sensorPosition			: LREAL;
+	
+	init_sensor_x			: BOOL;
+	lamp1				: BOOL;
+	lamp2				: BOOL;	
+END_VAR]]></Declaration>
+    <ObjectProperties />
+  </GVL>
+</TcPlcObject>

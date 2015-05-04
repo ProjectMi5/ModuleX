@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.25">
+  <DUT Name="MNG_DatagramHeader" Id="{2f3f616b-3b22-4d07-9e22-2e82d2ca15b7}">
+    <Declaration><![CDATA[TYPE MNG_DatagramHeader :(* datagram header (4 byte aligned) *)
+STRUCT
+	(* Time when datagram has been created *)
+	Counter 	: DWORD;
+	(* Time when datagram has been sent *)
+	SentTime 		: DWORD;
+	(* Type of the datagram *)
+	DatagramType 	: DWORD := MNG_UnknownDatagram;
+	(* Byte count in the payload *)
+	ByteCount 		: DWORD := 0;
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

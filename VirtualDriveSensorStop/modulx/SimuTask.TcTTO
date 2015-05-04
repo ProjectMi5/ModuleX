@@ -1,0 +1,15 @@
+﻿<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.23">
+  <Task Name="SimuTask" Id="{c987c2bf-eeaf-4ad7-89eb-96c5f127e115}">
+    <!--CycleTime in micro seconds.-->
+    <CycleTime>10000</CycleTime>
+    <Priority>21</Priority>
+    <PouCall>
+      <Name>MAIN_simu</Name>
+    </PouCall>
+    <TaskFBGuid>{bbefebd1-03ba-43f7-997c-a3af13190e91}</TaskFBGuid>
+    <Fb_init>{c1b7b8ba-76c4-4327-99e2-a61ee307add5}</Fb_init>
+    <Fb_exit>{64dad493-c463-475c-824c-a7c729ccbdac}</Fb_exit>
+    <CycleUpdate>{ac0f24b0-f0d7-4e98-8ca3-b5e10b1520ea}</CycleUpdate>
+    <PostCycleUpdate>{3cb1a290-5bab-453f-b99d-ea110a493924}</PostCycleUpdate>
+  </Task>
+</TcPlcObject>

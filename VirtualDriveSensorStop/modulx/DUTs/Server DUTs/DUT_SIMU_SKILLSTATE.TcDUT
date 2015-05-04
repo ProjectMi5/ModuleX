@@ -1,0 +1,16 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.25">
+  <DUT Name="DUT_SIMU_SKILLSTATE" Id="{4a30a3c1-fdbc-47d1-b627-a8e66f3e2a94}">
+    <Declaration><![CDATA[TYPE DUT_SIMU_SKILLSTATE :
+STRUCT
+	
+Ready 	:BOOL;
+Busy	:BOOL;
+Error	:BOOL;
+
+END_STRUCT
+END_TYPE
+]]></Declaration>
+    <ObjectProperties />
+  </DUT>
+</TcPlcObject>

@@ -1,0 +1,137 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<TcPlcObject Version="1.1.0.1" ProductVersion="3.1.0.25">
+  <POU Name="FB_FAKE_MODULE" Id="{430d4765-e26d-4ed9-86dd-700ea40f4598}">
+    <Declaration><![CDATA[FUNCTION_BLOCK FB_FAKE_MODULE
+VAR_INPUT
+	Execute : BOOL;
+	SKILLID	: ARRAY [0..SkillCnt] OF INT;
+	INPUT	: DUT_MODULE_INTERFACE_INPUT;
+	SkillTime	: TIME := T#5S;
+	ForceError	: BOOL;
+	ID			: INT := 42424;
+END_VAR
+VAR_OUTPUT
+	OUTPUT 	: DUT_MODULE_INTERFACE_OUTPUT;
+END_VAR
+
+VAR
+	LampTime	: TIME;
+	i 		: INT := 0;
+	state 	: INT := -10;
+	activeNr	: INT;
+	TIMER	: TON;
+	LampTimer	: TON;
+	
+	fbi_Timer: TOF;
+END_VAR
+]]></Declaration>
+    <Implementation>
+      <ST><![CDATA[IF Execute THEN
+	CASE state OF
+		
+	
+	-10: 
+		OUTPUT.Dummy := FALSE;
+		OUTPUT.Name	 := 'BeispielModul';
+		OUTPUT.ID	 := ID;
+		
+		FOR i := 0 TO SkillCnt DO
+		
+			IF SKILLID[i] > 0 THEN
+				OUTPUT.SkillOutput[i].ID := SKILLID[i];
+				OUTPUT.SkillOutput[i].Dummy := FALSE;
+			END_IF
+		
+		END_FOR
+		state := 0;
+		
+		
+	0: 	// ALLE SKILLS READY
+		FOR i := 0 TO SkillCnt DO
+			IF SKILLID[i] > 0 THEN 
+			OUTPUT.SkillOutput[i].Ready := TRUE;
+			OUTPUT.SkillOutput[i].Busy 	:= FALSE;
+			OUTPUT.SkillOutput[i].Done 	:= FALSE;
+			OUTPUT.SkillOutput[i].Name  := CONCAT ('Beispielskill', INT_TO_STRING(SKILLID[i]));
+				IF INPUT.SkillInput[i].Execute THEN
+					IF NOT (Input.SkillInput[i].ParameterInput[0].Value = 0) THEN
+					LampTime := REAL_TO_TIME(1/Input.SkillInput[i].ParameterInput[0].Value * 1000);
+					ELSE
+					LampTime := T#1s;
+					END_IF
+					activeNr := i;
+					state := 10;
+				END_IF
+			END_IF
+		END_FOR
+		
+	10: // KEIN SKILL READY, skill activeNR busy
+		FOR i := 0 TO SkillCnt DO
+			OUTPUT.SkillOutput[i].Ready := FALSE;		
+		END_FOR
+			
+		OUTPUT.SkillOutput[activeNr].Busy 	:= TRUE;
+		OUTPUT.SkillOutput[activeNr].Done 	:= FALSE;
+		TIMER(IN := FALSE, PT := SkillTime);
+		LampTimer(IN := FALSE, PT := LampTime);
+		
+		state := 20;
+		
+	20:	// SKILL AUSFÜHREN
+		TIMER(IN := TRUE);
+		
+		Lamp2 := TRUE;
+		LampTimer(IN := TRUE);
+		IF LampTimer.Q THEN
+			
+			LampTimer(IN := FALSE);
+			Lamp1 := NOT (Lamp1);
+		END_IF
+		
+		
+		
+		IF TIMER.Q THEN
+			IF NOT ForceError THEN
+				OUTPUT.SkillOutput[activeNr].Done 	:= TRUE;
+				OUTPUT.SkillOutput[activeNr].Busy	:= FALSE;
+			ELSE
+				OUTPUT.SkillOutput[activeNr].Error	:= TRUE;
+				OUTPUT.SkillOutput[activeNr].Busy	:= FALSE;
+			END_IF
+			state := 30;
+			Lamp2 := FALSE;
+			Lamp1 := FALSE;
+		END_IF
+		
+	30: // warten bis execute zurückgezogen
+		IF NOT INPUT.SkillInput[activeNr].Execute THEN
+			OUTPUT.SkillOutput[activeNr].Done 	:= FALSE;
+			OUTPUT.SkillOutput[activeNr].Error	:= FALSE;
+			state := 0;
+		END_IF
+		
+	
+	
+	
+	
+	END_CASE
+ELSE
+	state := -10;
+END_IF
+
+fbi_Timer();
+IF GVL.init_sensor_x THEN
+	Output.PositionSensor := TRUE;
+	
+	fbi_Timer(IN := TRUE,PT := T#400MS);
+	fbi_Timer(IN := FALSE,PT := T#400MS);	
+ELSE
+	Output.PositionSensor := fbi_Timer.Q;
+END_IF
+
+Output.ConnectionTestOutput := INPUT.ConnectionTestInput;
+OUTPUT.PositionOutput	:= INPUT.PositionInput;]]></ST>
+    </Implementation>
+    <ObjectProperties />
+  </POU>
+</TcPlcObject>
